@@ -1,6 +1,8 @@
 package com.example.unnamedthings.entity.projectile;
 
 import com.example.unnamedthings.UnnamedThings;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.particles.SpellParticleOption;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.arrow.AbstractArrow;
@@ -21,6 +23,14 @@ public class CupidArrow extends AbstractArrow {
 
     public CupidArrow(Level level, double x, double y, double z, ItemStack pickupItemStack, @Nullable ItemStack firedFromWeapon) {
         super(UnnamedThings.CUPID_ARROW.get(), x, y, z, level, pickupItemStack, firedFromWeapon);
+    }
+
+    public void tick() {
+        super.tick();
+
+        if(this.level().isClientSide() && !this.isInGround()) {
+            this.level().addParticle(ParticleTypes.HEART, this.getX(), this.getY(), this.getZ(), 0f, 0f, 0f);
+        }
     }
 
     @Override
