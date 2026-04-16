@@ -1,7 +1,6 @@
 package com.example.unnamedthings;
 
 import net.minecraft.data.PackOutput;
-import net.minecraft.locale.Language;
 import net.neoforged.neoforge.common.data.LanguageProvider;
 
 public class UnnamedThingsLanguageProvider extends LanguageProvider {

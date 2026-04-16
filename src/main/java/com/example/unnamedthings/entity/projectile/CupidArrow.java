@@ -1,7 +1,6 @@
 package com.example.unnamedthings.entity.projectile;
 
 import com.example.unnamedthings.UnnamedThings;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.arrow.AbstractArrow;
