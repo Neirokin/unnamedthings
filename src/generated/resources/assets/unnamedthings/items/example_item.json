@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "unnamedthings:item/example_item"
+  }
+}

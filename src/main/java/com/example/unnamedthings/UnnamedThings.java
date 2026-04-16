@@ -1,5 +1,12 @@
 package com.example.unnamedthings;
 
+import com.example.unnamedthings.client.renderer.entity.state.CupidArrowRenderer;
+import net.minecraft.client.renderer.entity.EntityRenderers;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
@@ -7,6 +14,8 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
@@ -31,6 +40,11 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
+import com.example.unnamedthings.entity.projectile.CupidArrow;
+import com.example.unnamedthings.item.CupidArrowItem;
+
+import java.util.function.Supplier;
+
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
 @Mod(UnnamedThings.MODID)
 public class UnnamedThings {
@@ -46,21 +60,48 @@ public class UnnamedThings {
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MODID);
 
     // Creates a new Block with the id "unnamedthings:example_block", combining the namespace and path
-    public static final DeferredBlock<Block> EXAMPLE_BLOCK = BLOCKS.registerSimpleBlock("example_block", BlockBehaviour.Properties.of().mapColor(MapColor.STONE));
+    public static final DeferredBlock<Block> EXAMPLE_BLOCK = BLOCKS.registerSimpleBlock("example_block", p -> p.mapColor(MapColor.STONE));
     // Creates a new BlockItem with the id "unnamedthings:example_block", combining the namespace and path
     public static final DeferredItem<BlockItem> EXAMPLE_BLOCK_ITEM = ITEMS.registerSimpleBlockItem("example_block", EXAMPLE_BLOCK);
 
-    // Creates a new food item with the id "unnamedthings:example_id", nutrition 1 and saturation 2
-    public static final DeferredItem<Item> EXAMPLE_ITEM = ITEMS.registerSimpleItem("example_item", new Item.Properties().food(new FoodProperties.Builder()
+    // Creates a new food item with the id ":example_id", nutrition 1 and saturation 2
+    public static final DeferredItem<Item> EXAMPLE_ITEM = ITEMS.registerSimpleItem("example_item", p -> p.food(new FoodProperties.Builder()
             .alwaysEdible().nutrition(1).saturationModifier(2f).build()));
 
+    public static final DeferredItem<CupidArrowItem> CUPID_ARROW_ITEM = ITEMS.registerItem(
+            "cupid_arrow",
+            CupidArrowItem::new,
+            props -> props
+    );
+
+    public static final DeferredRegister.Entities ENTITY_TYPES = DeferredRegister.createEntities(MODID);
+
+    public static final Supplier<EntityType<CupidArrow>> CUPID_ARROW = ENTITY_TYPES.register(
+            "cupid_arrow",
+            () -> EntityType.Builder.of(
+                            (EntityType<CupidArrow> type, Level level) -> new CupidArrow(type, level),
+                    MobCategory.MISC
+            )
+                    .noLootTable()
+                    .sized(0.5f, 0.5f)
+                    .eyeHeight(0.13f)
+                    .clientTrackingRange(4)
+                    .updateInterval(20)
+                    .build(ResourceKey.create(
+                            Registries.ENTITY_TYPE,
+                            Identifier.fromNamespaceAndPath("unnamedthings", "cupid_arrow")
+                    ))
+    );
+
     // Creates a creative tab with the id "unnamedthings:example_tab" for the example item, that is placed after the combat tab
-    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> EXAMPLE_TAB = CREATIVE_MODE_TABS.register("example_tab", () -> CreativeModeTab.builder()
+    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> UNNAMED_THINGS_TAB = CREATIVE_MODE_TABS.register("unnamedthings_tab", () -> CreativeModeTab.builder()
             .title(Component.translatable("itemGroup.unnamedthings")) //The language key for the title of your CreativeModeTab
             .withTabsBefore(CreativeModeTabs.COMBAT)
-            .icon(() -> EXAMPLE_ITEM.get().getDefaultInstance())
+            .icon(() -> CUPID_ARROW_ITEM.get().getDefaultInstance())
             .displayItems((parameters, output) -> {
                 output.accept(EXAMPLE_ITEM.get()); // Add the example item to the tab. For your own tabs, this method is preferred over the event
+                output.accept(EXAMPLE_BLOCK_ITEM.get()); // Add the example item to the tab. For your own tabs, this method is preferred over the event
+                output.accept(CUPID_ARROW_ITEM.get());
             }).build());
 
     // The constructor for the mod class is the first code that is run when your mod is loaded.
@@ -73,6 +114,7 @@ public class UnnamedThings {
         BLOCKS.register(modEventBus);
         // Register the Deferred Register to the mod event bus so items get registered
         ITEMS.register(modEventBus);
+        ENTITY_TYPES.register(modEventBus);
         // Register the Deferred Register to the mod event bus so tabs get registered
         CREATIVE_MODE_TABS.register(modEventBus);
 

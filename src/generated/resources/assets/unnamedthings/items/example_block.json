@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "unnamedthings:block/example_block"
+  }
+}
